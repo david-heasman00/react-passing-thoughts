@@ -1,47 +1,36 @@
-import { useState } from 'react';
-import { AddThoughtForm } from './AddThoughtForm';
-import { Thought } from './Thought';
-import { generateId, getNewExpirationTime } from './utilities';
+import { useEffect } from 'react';
 
-export default function App() {
-  const [thoughts, setThoughts] = useState([
-    {
-      id: generateId(),
-      text: 'This is a place for your passing thoughts.',
-      expiresAt: getNewExpirationTime(),
-    },
-    {
-      id: generateId(),
-      text: "They'll be removed after 15 seconds.",
-      expiresAt: getNewExpirationTime(),
-    },
-  ]);
+export function Thought(props) {
 
-  const addThought = (thought) => {
-    setThoughts((thoughts) => [thought, ...thoughts]);
-  }
+  useEffect(() => {
+    //Calculate when thought expires
+    const timeRemaining = thought.expiresAt - Date.now();
+    //Create timer
+    const timeOut = setTimeout(()=> {
+      removeThought(thought.id);
+    }, timeRemaining);
+    //Clean up
+    return () => {
+      clearTimeout(timeOut);
+    };
+  }, [thought]);
 
-  const removeThought = (thoughtIdToRemove) => {
-    setThoughts((thoughts) => 
-      thoughts.filter((thought) => thought.id !== thoughtIdToRemove)
-      );
+  const { thought, removeThought } = props;
+
+  const handleRemoveClick = () => {
+    removeThought(thought.id);
   };
 
   return (
-    <div className="App">
-      <header>
-        <h1>Passing Thoughts</h1>
-      </header>
-      <main>
-        <AddThoughtForm 
-          addThought = {addThought} 
-        />
-        <ul className="thoughts">
-          {thoughts.map((thought) => (
-            <Thought key={thought.id} thought={thought} removeThought={removeThought} />
-          ))}
-        </ul>
-      </main>
-    </div>
+    <li className="Thought">
+      <button
+        aria-label="Remove thought"
+        className="remove-button"
+        onClick={handleRemoveClick}
+      >
+        &times;
+      </button>
+      <div className="text">{thought.text}</div>
+    </li>
   );
 }
