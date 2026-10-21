@@ -10,14 +10,17 @@ export function AddThoughtForm(props) {
   };
 
   const handleSubmit = (event) => {
-    event.preventDefault();
-    const thought = {
-      id: generateId(),
-      text: text,
-      expiresAt: getNewExpirationTime()
+    if (text.length > 0) {
+      event.preventDefault();
+      const thought = {
+        id: generateId(),
+        text: text,
+        expiresAt: getNewExpirationTime()
+      };
+      props.addThought(thought);
+      setText('');
     };
-    props.addThought(thought);
-    setText('');
+    event.preventDefault();
   };
 
   return (
